@@ -3,7 +3,7 @@ import requests
 from PIL import Image
 import io
 
-API_URL = "https://your-fastapi-service.onrender.com/predict/"  # Replace with your Render FastAPI URL
+API_URL ="https://fashion-product-image-classification.onrender.com/predict/"
 
 st.set_page_config(page_title="Fashion Product Classifier", layout="centered")
 st.title("🧥 Fashion Product Multi-Label Classifier")
