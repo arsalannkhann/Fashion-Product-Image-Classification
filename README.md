@@ -1,145 +1,167 @@
-Here’s your polished README.md—ready to paste into your GitHub repo. Scroll down further for instructions to generate a matching PDF version.
+🧠 Fashion Product Image Classification
+A multi-output deep learning system for classifying fashion product images, predicting:
 
-⸻
+👕 Gender (e.g., Men, Women)  
+🎨 Base Color (e.g., Black, Blue)  
+❄️ Season (e.g., Winter, Summer)  
+🛍️ Product Category (e.g., Apparel, Accessories)
+
+Built with TensorFlow, this project provides a robust pipeline for training, evaluation, and inference, with plans for FastAPI and Streamlit integration for deployment.
+
+📁 Dataset
+
+Source: Kaggle – Fashion Product Images Dataset  
+Size: ~24 GB  
+Files Used:  
+styles.csv: Metadata for fashion products  
+images/: Directory of product images
 
 
-# 🧠 Fashion Product Image Classification
 
-A multi-output deep learning application that classifies fashion product images by predicting:
 
-- 👕 **Gender**  
-- 🎨 **Base Color**  
-- ❄️ **Season**  
-- 🛍️ **Product Category**
+🧪 Model Overview
 
-This project uses **TensorFlow**, **FastAPI**, **Docker**, and **Streamlit** to serve an end-to-end deployable machine learning system.
+Backbone: ResNet50 (pretrained on ImageNet)  
+Architecture: Shared CNN with four output heads for gender, baseColour, season, and masterCategory.  
+Loss Function: Custom SparseCategoricalFocalLoss (gamma=1.5) to handle class imbalance.  
+Metrics: Accuracy, Precision, Recall, F1-score per output head.  
+Callbacks: EarlyStopping, ModelCheckpoint, ReduceLROnPlateau.  
+Exported Formats: .h5, .keras, and pickled LabelEncoder objects.
 
----
 
-## 📁 Dataset
-
-- **Source**: [Kaggle – Fashion Product Images Dataset](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset)  
-- **Size**: ~24 GB  
-- **Files used**: `styles.csv` for metadata + `images/` folder for visuals
-
----
-
-## 🧪 Model Overview
-
-- **Backbone**: `MobileNetV2` (pretrained on ImageNet)  
-- **Architecture**: Shared CNN → 4 output heads (gender, baseColour, season, masterCategory)  
-- **Training**:  
-  - Loss: `sparse_categorical_crossentropy` per output  
-  - Metrics: `accuracy` per output  
-  - Callbacks: `EarlyStopping`, `ModelCheckpoint`  
-- **Output formats**: Saved as `.h5` / SavedModel + converted to TFLite
-
----
-
-## 🛠️ Code Structure
-
-fashion-product-image-classification/
-├── Model/                     # Trained model & label encoders
+🛠️ Project Structure
+Fashion-Product-Image-Classification/
+├── model/                     # Trained models and label encoders
+│   ├── multioutput_model.keras
 │   ├── best_model.h5
-│   ├── gender_encoder.pkl
-│   ├── color_encoder.pkl
-│   ├── season_encoder.pkl
-│   └── product_encoder.pkl
-│
-├── api/                       # Backend (FastAPI)
-│   ├── main.py
+│   ├── label_encoder_gender.pkl
+│   ├── label_encoder_baseColour.pkl
+│   ├── label_encoder_season.pkl
+│   └── label_encoder_masterCategory.pkl
+├── data/                      # Sample images for testing
+│   └── test_samples/
+├── training/                  # Training and preprocessing scripts
+│   ├── fashion_product_analysis.py  # Main script
+│   └── config.yaml            # Configuration (optional)
+├── backend/                   # FastAPI backend (planned)
+│   ├── app/
+│   │   ├── main.py            # FastAPI routes
+│   │   ├── predict.py         # Inference logic
+│   │   └── utils.py           # Image preprocessing
 │   ├── Dockerfile
-│   └── requirements.txt
-│
-├── streamlit_app/             # Frontend
+│   ├── requirements.txt
+│   └── test/
+├── frontend/                  # Streamlit frontend (planned)
 │   ├── streamlit_app.py
 │   └── requirements.txt
-│
-├── environment.yml           # Conda environment setup
-└── README.md                 # Documentation you’re reading
+├── environment.yml            # Conda environment configuration
+├── README.md                  # This documentation
+└── .gitignore                 # Git ignore file
 
----
 
-## 🚀 Quick Start
+🚀 Quick Start
+📋 Prerequisites
 
-### ✅ Backend
+Python 3.8+  
+TensorFlow 2.10+  
+Libraries: pandas, numpy, scikit-learn, matplotlib, seaborn, Pillow, kagglehub, imblearn  
+Optional: Docker, Conda (for environment management)
 
-##### Locally
-```bash
-cd api
+🔧 Setup
+
+Clone the Repository  
+git clone https://github.com/your-username/Fashion-Product-Image-Classification.git
+cd Fashion-Product-Image-Classification
+
+
+Set Up Conda Environment  
+conda env create -f environment.yml
+conda activate fashion-ml
+
+
+Download DatasetEnsure you have a Kaggle account and API token set up (~/.kaggle/kaggle.json). Then run:
+python training/fashion_product_analysis.py
+
+This downloads the dataset via kagglehub to ~/.kaggle/ or a specified path.
+
+Train the ModelRun the training script:
+python training/fashion_product_analysis.py
+
+The script handles data preprocessing, model training, and saves the model to model/multioutput_model.keras.
+
+
+
+🚀 Inference
+Local Inference
+Run the demo inference section of the script to test on sample images:
+python training/fashion_product_analysis.py
+
+This loads the trained model and predicts on sample Amazon image URLs.
+Planned API Deployment (FastAPI)
+
+Navigate to the backend directory:cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 
-Docker
 
-cd api
-docker build -t fashion-api .
-docker run -p 8000:8000 fashion-api
+Access the API at http://localhost:8000.
 
-API Endpoints:
-	•	GET  / → Health check
-	•	POST /predict → Accepts multipart/form-data (key = file, value = image)
+Planned UI Deployment (Streamlit)
 
-⸻
-
-✅ Frontend (Streamlit)
-
-cd streamlit_app
+Navigate to the frontend directory:cd frontend
 pip install -r requirements.txt
 streamlit run streamlit_app.py
 
-Uploads an image and displays predictions using the backend API.
 
-⸻
-
-🔧 Conda Environment Setup
-
-Use this to avoid wheel errors:
-
-conda env create -f environment.yml
-conda activate fashion-ml-api
-cd api && pip install -r requirements.txt
-cd ../streamlit_app && pip install -r requirements.txt
+Upload images via the Streamlit UI to view predictions.
 
 
-⸻
+🧪 Testing
 
-✅ How to Test
-	1.	Postman / curl example:
-
-curl -X POST https://<your-backend-url>/predict \
-     -F "file=@/path/to/test.jpg"
+API Testing (once backend is implemented):  
+curl -X POST http://localhost:8000/predict -F "file=@data/test_samples/sample.jpg"
 
 
-	2.	Streamlit app:
-	•	Upload image
-	•	View raw JSON response and displayed predictions
-
-⸻
-
-🧩 Example Output
-
-Sample	Gender	Color	Season	Category
-	Women	Black	Winter	Apparel
+Local Testing: Use the demo inference section in fashion_product_analysis.py to predict on sample images.
 
 
-⸻
 
-🛠️ Next Steps
-	•	Add multiple-product detection via bounding boxes
-	•	Quantize model with TFLite for edge deployment
-	•	Enhance UI: live camera, voice input, batch upload
-	•	Publish to Hugging Face Spaces or deploy on Vercel
+📊 Sample Output
 
-⸻
+
+
+Gender
+Color
+Season
+Category
+
+
+
+Women
+Black
+Winter
+Apparel
+
+
+
+🛠️ Future Enhancements
+
+Implement FastAPI backend for production-grade inference.  
+Deploy Streamlit app for interactive UI with webcam support.  
+Add object detection for multiple products in a single image.  
+Optimize model with TFLite for edge deployment.  
+Publish to Hugging Face Spaces or Vercel for public access.
+
+
+❓ Troubleshooting
+
+Dataset Download Issues: Ensure Kaggle API token is configured (~/.kaggle/kaggle.json).  
+Missing Images: Verify the images/ folder exists and matches styles.csv IDs.  
+Training Errors: Check for sufficient GPU memory or reduce batch size in fashion_product_analysis.py.  
+Dependency Conflicts: Use the provided environment.yml to ensure consistent library versions.
+
 
 👤 Author
-
-Arsalan Khan – GitHub
-Based on dataset by Param Aggarwal (Kaggle)
-
-⸻
-
-📄 License: For research and education only. No commercial use without permission.
-
----
+Arsalan Khan 
+📄 License
+For research and educational purposes only.Commercial use requires explicit permission from the dataset owner and author.
