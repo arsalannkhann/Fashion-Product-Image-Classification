@@ -1,0 +1,17 @@
+name: fashion-ml-api
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - fastapi==0.110.1
+      - uvicorn[standard]==0.29.0
+      - tensorflow==2.15.0
+      - scikit-learn==1.4.0
+      - pillow==10.2.0
+      - streamlit==1.34.0
+      - requests==2.31.0
+      - python-multipart==0.0.9
