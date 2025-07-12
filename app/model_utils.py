@@ -13,7 +13,7 @@ model = tf.keras.models.load_model(MODEL_PATH)
 # Load label encoders
 label_encoders = {}
 for label in ["gender", "baseColour", "season", "masterCategory"]:
-    with open(f"app/label_encoder_{label}.pkl", "rb") as f:
+    with open(f"app/{label}.pkl", "rb") as f:
         label_encoders[label] = pickle.load(f)
 
 def preprocess_image(image_bytes):
