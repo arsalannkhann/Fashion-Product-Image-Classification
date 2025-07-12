@@ -14,7 +14,7 @@ API_URL = "https://fashion-product-image-classification.onrender.com/predict"
 
 # --- Sidebar with samples ---
 st.sidebar.header("📂 Sample Images")
-sample_dir = "sample_images"
+sample_dir = "streamlit_app/sample_images"
 sample_files = [f for f in os.listdir(sample_dir) if f.lower().endswith(("jpg", "png", "jpeg"))]
 sample_choice = st.sidebar.selectbox("Or try a sample image:", ["None"] + sample_files)
 
