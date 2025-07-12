@@ -1,25 +1,47 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from app.model_utils import preprocess_image, predict
+from typing import Dict
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+import io
+import pickle
 
-app = FastAPI(title="Fashion Product Classifier API")
+app = FastAPI()
 
-# CORS if frontend hosted separately
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)) -> Dict:
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents)).convert("RGB")
+    
+    # Preprocess
+    image = image.resize((128, 128))
+    image = np.array(image) / 255.0
+    image = np.expand_dims(image, axis=0)
 
-@app.get("/")
-def root():
-    return {"message": "Fashion Multi-label Classifier API is up!"}
+    # Load model
+    model = tf.keras.models.load_model("Model/best_model.h5")
 
-@app.post("/predict/")
-async def classify_image(file: UploadFile = File(...)):
-    img_bytes = await file.read()
-    image_tensor = preprocess_image(img_bytes)
-    results = predict(image_tensor)
-    return results
+    # Load label encoders
+    with open("encoders/gender.pkl", "rb") as f:
+        gender_enc = pickle.load(f)
+    with open("encoders/color.pkl", "rb") as f:
+        color_enc = pickle.load(f)
+    with open("encoders/season.pkl", "rb") as f:
+        season_enc = pickle.load(f)
+    with open("encoders/product.pkl", "rb") as f:
+        product_enc = pickle.load(f)
+
+    # Predict
+    preds = model.predict(image)
+    gender = gender_enc.inverse_transform([np.argmax(preds[0])])[0]
+    color = color_enc.inverse_transform([np.argmax(preds[1])])[0]
+    season = season_enc.inverse_transform([np.argmax(preds[2])])[0]
+    product = product_enc.inverse_transform([np.argmax(preds[3])])[0]
+
+    return {
+        "gender": gender,
+        "baseColour": color,
+        "season": season,
+        "masterCategory": product
+    }
