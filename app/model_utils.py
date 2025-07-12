@@ -5,7 +5,7 @@ import pickle
 import os
 
 IMG_SIZE = 128
-MODEL_PATH = "multioutput_model.keras"
+MODEL_PATH = "app/multioutput_model.keras"
 
 # Load model
 model = tf.keras.models.load_model(MODEL_PATH)
