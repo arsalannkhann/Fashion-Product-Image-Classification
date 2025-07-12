@@ -5,7 +5,7 @@ import pickle
 import os
 
 IMG_SIZE = 128
-MODEL_PATH = "app/multioutput_model"
+MODEL_PATH = "Model/best_model.h5"
 
 # Load model
 model = tf.keras.models.load_model(MODEL_PATH)
